@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Beth</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .page {
+            display: none;
+            position: relative;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .page.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Video de YouTube como fondo */
+        #youtube-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        
+        #youtube-background iframe {
+            width: 100vw;
+            height: 56.25vw;
+            min-height: 100vh;
+            min-width: 177.77vh;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        #video-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, rgba(0, 0, 0, 0.7), rgba(128, 0, 64, 0.5));
+            z-index: -1;
+        }
+        
+        /* Contenedores */
+        .access-container, .options-container, .message-container {
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            padding: 40px 30px;
+            background-color: rgba(0, 0, 0, 0.8);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(219, 112, 147, 0.6);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(219, 112, 147, 0.4);
+        }
+        
+        h1 {
+            color: #db7093;
+            margin-bottom: 25px;
+            font-size: 2.8rem;
+            text-shadow: 0 0 15px rgba(219, 112, 147, 0.8);
+            letter-spacing: 1px;
+        }
+        
+        h2 {
+            color: #db7093;
+            margin-bottom: 20px;
+            font-size: 2.2rem;
+            text-shadow: 0 0 10px rgba(219, 112, 147, 0.7);
+        }
+        
+        h3 {
+            color: #ffb6c1;
+            margin-bottom: 15px;
+            font-size: 1.6rem;
+        }
+        
+        p {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+        
+        .code-container {
+            margin: 30px 0;
+        }
+        
+        #time-input {
+            width: 100%;
+            max-width: 200px;
+            padding: 18px;
+            font-size: 1.5rem;
+            border: none;
+            border-radius: 12px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            text-align: center;
+            letter-spacing: 3px;
+            border: 3px solid rgba(219, 112, 147, 0.6);
+            transition: all 0.3s;
+            margin-bottom: 25px;
+        }
+        
+        #time-input:focus {
+            outline: none;
+            border-color: #db7093;
+            box-shadow: 0 0 20px rgba(219, 112, 147, 0.7);
+            transform: scale(1.05);
+        }
+        
+        button {
+            padding: 18px 40px;
+            font-size: 1.2rem;
+            background: linear-gradient(45deg, #db7093, #c71585);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 15px 10px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+        
+        button:hover {
+            background: linear-gradient(45deg, #c71585, #db7093);
+            transform: scale(1.08);
+            box-shadow: 0 0 20px rgba(219, 112, 147, 0.8);
+        }
+        
+        .back-btn {
+            background: linear-gradient(45deg, #666, #444);
+        }
+        
+        .back-btn:hover {
+            background: linear-gradient(45deg, #555, #333);
+            box-shadow: 0 0 15px rgba(100, 100, 100, 0.6);
+        }
+        
+        /* Tarjetas de opciones */
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+        }
+        
+        .card {
+            width: 280px;
+            background: linear-gradient(145deg, rgba(70, 0, 35, 0.9), rgba(100, 0, 50, 0.7));
+            border-radius: 18px;
+            padding: 35px 25px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s;
+            border: 3px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-15px) scale(1.03);
+            border-color: #db7093;
+            box-shadow: 0 15px 35px rgba(219, 112, 147, 0.5);
+        }
+        
+        .card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: 0.5s;
+        }
+        
+        .card:hover:before {
+            left: 100%;
+        }
+        
+        .card-icon {
+            font-size: 3.5rem;
+            color: #db7093;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(219, 112, 147, 0.5);
+        }
+        
+        .card-title {
+            font-size: 1.6rem;
+            color: #fff;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .card-description {
+            color: #ddd;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        
+        .selected-card {
+            background: linear-gradient(145deg, rgba(90, 0, 45, 0.95), rgba(120, 0, 60, 0.8));
+            border-color: #ff1493;
+            box-shadow: 0 0 35px rgba(255, 20, 147, 0.6);
+            transform: translateY(-10px);
+        }
+        
+        /* Mensaje de resultado */
+        .result-icon {
+            font-size: 4rem;
+            color: #db7093;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(219, 112, 147, 0.7);
+        }
+        
+        .result-message {
+            font-size: 1.4rem;
+            line-height: 1.7;
+            margin-bottom: 35px;
+            color: #fff;
+            white-space: pre-line;
+            text-align: left;
+            padding: 25px;
+            background: rgba(219, 112, 147, 0.1);
+            border-radius: 15px;
+            border-left: 5px solid #db7093;
+        }
+        
+        /* Carta del día */
+        .daily-letter {
+            background: linear-gradient(145deg, rgba(219, 112, 147, 0.15), rgba(199, 21, 133, 0.1));
+            border-radius: 18px;
+            padding: 30px;
+            margin: 35px 0;
+            border: 2px solid rgba(219, 112, 147, 0.3);
+            text-align: left;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .letter-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(219, 112, 147, 0.3);
+            padding-bottom: 15px;
+        }
+        
+        .letter-date {
+            color: #ffb6c1;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .letter-content {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            white-space: pre-line;
+            color: #f0f0f0;
+        }
+        
+        /* Efecto de máquina de escribir */
+        .typing-text {
+            white-space: pre-wrap;
+            overflow: hidden;
+            font-size: 1.4rem;
+            line-height: 1.8;
+            text-align: center;
+            color: #fff;
+            min-height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .cursor {
+            display: inline-block;
+            width: 4px;
+            background-color: #db7093;
+            animation: blink-cursor 0.7s infinite;
+            margin-left: 3px;
+            height: 1.4em;
+        }
+        
+        @keyframes blink-cursor {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* Mensaje de error */
+        .error-message {
+            color: #ff6b6b;
+            margin-top: 15px;
+            font-size: 1rem;
+            min-height: 25px;
+            font-weight: bold;
+        }
+        
+        /* Información de hora */
+        .time-info {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(219, 112, 147, 0.15);
+            border-radius: 12px;
+            font-size: 1.1rem;
+            border: 1px solid rgba(219, 112, 147, 0.3);
+        }
+        
+        .password-display {
+            background: rgba(255, 20, 147, 0.25);
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 1.4rem;
+            letter-spacing: 2px;
+            border: 2px dashed #db7093;
+        }
+        
+        /* Reloj */
+        .clock-container {
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px auto;
+            max-width: 300px;
+            border: 2px solid rgba(219, 112, 147, 0.4);
+        }
+        
+        .clock-time {
+            font-size: 2.5rem;
+            font-family: 'Courier New', monospace;
+            color: #db7093;
+            text-shadow: 0 0 10px rgba(219, 112, 147, 0.7);
+            letter-spacing: 3px;
+        }
+        
+        .clock-label {
+            color: #ffb6c1;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .access-container, .options-container, .message-container {
+                width: 95%;
+                padding: 30px 20px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            h2 {
+                font-size: 1.8rem;
+            }
+            
+            .cards-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 25px;
+            }
+            
+            .card {
+                width: 100%;
+                max-width: 320px;
+                padding: 25px 20px;
+            }
+            
+            .clock-time {
+                font-size: 2rem;
+            }
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        /* Animación de entrada */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-out;
+        }
+        
+        /* Nota del día */
+        .day-note {
+            background: rgba(219, 112, 147, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 5px solid #db7093;
+            text-align: left;
+        }
+        
+        .day-note h4 {
+            color: #db7093;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3rem;
+        }
+        
+        /* Contador de intentos */
+        .attempts-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 1rem;
+            border: 2px solid rgba(219, 112, 147, 0.4);
+            z-index: 100;
+        }
+        
+        /* Instrucciones */
+        .instructions {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 20px 0;
+            border: 1px solid rgba(219, 112, 147, 0.3);
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Video de YouTube como fondo -->
+    <div id="youtube-background">
+        <iframe 
+            src="https://www.youtube.com/embed/VTH1zCgC1kI?si=MVFkHbYnkmOG8geu&autoplay=1&mute=1&loop=1&playlist=VTH1zCgC1kI&controls=0&showinfo=0&rel=0&modestbranding=1" 
+            title="YouTube video player" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+            referrerpolicy="strict-origin-when-cross-origin" 
+            allowfullscreen>
+        </iframe>
+    </div>
+    <div id="video-overlay"></div>
+    
+    <!-- Página 1: Contraseña por hora (11:40) -->
+    <div class="page active" id="page1">
+        <div class="access-container fade-in">
+            <h1><i class="fas fa-clock"></i> Acceso Temporal</h1>
+            <p>Esta página solo es accesible a una hora específica del día.</p>
+            <p>Introduce la hora correcta para continuar.</p>
+            
+            <div class="clock-container">
+                <div class="clock-time" id="current-clock">--:--</div>
+                <div class="clock-label">HORA ACTUAL</div>
+            </div>
+            
+            <div class="code-container">
+                <input type="text" id="time-input" maxlength="5" placeholder="HH:MM">
+                <div class="error-message" id="time-error"></div>
+                <br>
+                <button id="submit-btn">Verificar Hora</button>
+            </div>
+            
+            
+            
+            <div class="instructions">
+                <i class="fas fa-info-circle"></i> Formato: HH:MM (24 horas)
+            </div>
+        </div>
+    </div>
+    
+    <!-- Página 2: Opciones (sin contraseñas) -->
+    <div class="page" id="page2">
+        <div class="options-container fade-in">
+            <h2><i class="fas fa-road"></i> Elige Tu Camino</h2>
+            <p>No hay contraseñas aquí, solo elecciones.</p>
+            <p>Cada opción te llevará a un mensaje diferente.</p>
+            
+            <!-- Carta del día -->
+            <div class="daily-letter">
+                <div class="letter-header">
+                    <h3><i class="fas fa-envelope-open-text"></i> Mensaje del Día</h3>
+                    <span class="letter-date" id="today-date">Cargando...</span>
+                </div>
+                <div class="letter-content" id="today-message">
+                    Holaaa, esta página se estará actualizando 
+                atreves de los días con diferentes opciones cada una tendrá diferentes cosas 
+                y me tendrás que decir cual escogiste para actualizarla o si ya has entrado.
+                Por el día de hoy es todo hoy no hay nada en las opciones. 
+
+        
+                </div>
+            </div>
+            
+            <div class="cards-container">
+                <div class="card" data-option="1">
+                    <div class="card-icon">
+                        <i class="fas fa-compass"></i>
+                    </div>
+                    <h3 class="card-title">Opcion 1</h3>
+                    <p class="card-description">
+                        Ruta 1
+                    </p>
+                    <div class="time-info">
+                        <small><i class="fas fa-check-circle"></i> Mensaje </small>
+                    </div>
+                </div>
+                
+                <div class="card" data-option="2">
+                    <div class="card-icon">
+                        <i class="fas fa-question-circle"></i>
+                    </div>
+                    <h3 class="card-title"> Opcion 2</h3>
+                    <p class="card-description">
+                    Ruta 2  
+                    </p>
+                    <div class="time-info">
+                        <small><i class="fas fa-magic"></i> Mensaje especial</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="time-info" style="margin-top: 30px;">
+                <i class="fas fa-hand-point-up"></i> Solo haz clic en la opción que prefieras
+            </div>
+            
+            <button class="back-btn" id="back-to-time-btn">
+                <i class="fas fa-arrow-left"></i> Volver al acceso por hora
+            </button>
+        </div>
+    </div>
+    
+    <!-- Página 3: Resultado/Mensaje -->
+    <div class="page" id="page3">
+        <div class="message-container fade-in">
+            <div class="result-icon" id="result-icon"></div>
+            <h2 id="result-title">Tu Elección</h2>
+            
+            <div class="result-message">
+                <div class="typing-text" id="typing-text"></div>
+                <span class="cursor" id="cursor"></span>
+            </div>
+            
+            <div class="daily-letter" id="special-message" style="display: none;">
+                <div class="letter-header">
+                    <h3><i class="fas fa-gem"></i> Mensaje Especial</h3>
+                    <span class="letter-date">Exclusivo</span>
+                </div>
+                <div class="letter-content" id="special-message-content">
+                    <!-- Se llenará con JavaScript -->
+                </div>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <button class="back-btn" id="try-again-btn">Elegir otra opción</button>
+                <button id="new-day-btn" style="display: none;">Continuar mañana</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Contador de intentos -->
+    <div class="attempts-counter">
+        <i class="fas fa-history"></i> Accesos: <span id="attempts-count">0</span>
+    </div>
+    
+    <script>
+        // Elementos del DOM
+        const pages = {
+            page1: document.getElementById('page1'),
+            page2: document.getElementById('page2'),
+            page3: document.getElementById('page3')
+        };
+        
+        const timeInput = document.getElementById('time-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const timeError = document.getElementById('time-error');
+        const currentClock = document.getElementById('current-clock');
+        const todayDate = document.getElementById('today-date');
+        const todayMessage = document.getElementById('today-message');
+        const cards = document.querySelectorAll('.card');
+        const backToTimeBtn = document.getElementById('back-to-time-btn');
+        const typingText = document.getElementById('typing-text');
+        const cursor = document.getElementById('cursor');
+        const resultIcon = document.getElementById('result-icon');
+        const resultTitle = document.getElementById('result-title');
+        const tryAgainBtn = document.getElementById('try-again-btn');
+        const newDayBtn = document.getElementById('new-day-btn');
+        const attemptsCount = document.getElementById('attempts-count');
+        const specialMessage = document.getElementById('special-message');
+        const specialMessageContent = document.getElementById('special-message-content');
+        
+        // Variables de estado
+        const correctTime = "00:00"; // Hora de acceso
+        let selectedOption = null;
+        let messageIndex = 0;
+        let typingSpeed = 50;
+        let attempts = 0;
+        
+        // Mensajes según la opción
+        const optionMessages = {
+            1: `Hoy nada`,
+            
+            2: `Hoy nada`
+        };
+        
+        // Mensaje especial (solo para opción 2)
+        const specialMessages = {
+            2: `PARA BETH:
+Hoy nada 
+`
+        };
+        
+        // Íconos para cada opción
+        const optionIcons = {
+            1: '<i class="fas fa-compass"></i>',
+            2: '<i class="fas fa-question-circle"></i>'
+        };
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar fecha de hoy
+            setupTodayInfo();
+            
+            // Actualizar reloj en tiempo real
+            updateClock();
+            setInterval(updateClock, 1000);
+            
+            // Configurar eventos
+            submitBtn.addEventListener('click', checkTimeAccess);
+            timeInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') checkTimeAccess();
+            });
+            
+            // Eventos para las tarjetas de opciones
+            cards.forEach(card => {
+                card.addEventListener('click', function() {
+                    selectOption(this);
+                });
+            });
+            
+            backToTimeBtn.addEventListener('click', function() {
+                switchPage('page1');
+            });
+            
+            tryAgainBtn.addEventListener('click', function() {
+                switchPage('page2');
+            });
+            
+            newDayBtn.addEventListener('click', function() {
+                alert("¡El mensaje de mañana te espera!");
+                switchPage('page1');
+            });
+            
+            // Inicializar contador de intentos
+            attempts = parseInt(localStorage.getItem('timeAttempts')) || 0;
+            attemptsCount.textContent = attempts;
+        });
+        
+        // Configurar información del día
+        function setupTodayInfo() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            todayDate.textContent = now.toLocaleDateString('es-ES', options);
+        }
+        
+        // Función para actualizar el reloj
+        function updateClock() {
+            const now = new Date();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            const seconds = now.getSeconds().toString().padStart(2, '0');
+            const timeString = `${hours}:${minutes}:${seconds}`;
+            
+            currentClock.textContent = timeString;
+        }
+        
+        // Función para cambiar entre páginas
+        function switchPage(pageId) {
+            // Ocultar todas las páginas
+            Object.values(pages).forEach(page => {
+                page.classList.remove('active');
+            });
+            
+            // Mostrar la página solicitada
+            setTimeout(() => {
+                pages[pageId].classList.add('active');
+                // Agregar animación
+                const container = pages[pageId].querySelector('.access-container, .options-container, .message-container');
+                if (container) {
+                    container.classList.add('fade-in');
+                }
+            }, 50);
+            
+            // Limpiar errores
+            timeError.textContent = '';
+            
+            // Limpiar campos de entrada
+            if (pageId === 'page1') {
+                timeInput.value = '';
+                timeInput.focus();
+            }
+            
+            // Actualizar reloj
+            updateClock();
+        }
+        
+        // Función para verificar la hora de acceso
+        function checkTimeAccess() {
+            const enteredTime = timeInput.value.trim();
+            
+            // Validar formato básico
+            if (!/^\d{2}:\d{2}$/.test(enteredTime)) {
+                timeError.textContent = 'Formato incorrecto. Usa HH:MM';
+                timeInput.style.borderColor = '#ff6b6b';
+                return;
+            }
+            
+            if (enteredTime === correctTime) {
+                // Hora correcta
+                timeError.textContent = '';
+                timeInput.style.borderColor = '#4CAF50';
+                timeInput.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
+                
+                // Incrementar intentos
+                attempts++;
+                localStorage.setItem('timeAttempts', attempts);
+                attemptsCount.textContent = attempts;
+                
+                // Mostrar éxito
+                timeInput.value = '✓ ACCESO CONCEDIDO';
+                timeInput.style.color = '#4CAF50';
+                timeInput.style.fontWeight = 'bold';
+                
+                // Cambiar a página de opciones después de un breve retraso
+                setTimeout(() => {
+                    switchPage('page2');
+                    // Restaurar input
+                    setTimeout(() => {
+                        timeInput.style.color = 'white';
+                        timeInput.style.fontWeight = 'normal';
+                        timeInput.style.borderColor = 'rgba(219, 112, 147, 0.6)';
+                        timeInput.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    }, 1000);
+                }, 1500);
+                
+            } else {
+                // Hora incorrecta
+                timeError.textContent = `Hora incorrecta`
+                timeInput.style.borderColor = '#ff6b6b';
+                timeInput.style.backgroundColor = 'rgba(255, 107, 107, 0.1)';
+                
+                // Incrementar intentos
+                attempts++;
+                localStorage.setItem('timeAttempts', attempts);
+                attemptsCount.textContent = attempts;
+                
+                // Limpiar después de 3 segundos
+                setTimeout(() => {
+                    timeInput.style.borderColor = 'rgba(219, 112, 147, 0.6)';
+                    timeInput.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                    timeError.textContent = '';
+                }, 3000);
+            }
+        }
+        
+        // Función para seleccionar una opción
+        function selectOption(card) {
+            selectedOption = card.getAttribute('data-option');
+            
+            // Remover selección anterior
+            cards.forEach(c => c.classList.remove('selected-card'));
+            
+            // Seleccionar nueva tarjeta
+            card.classList.add('selected-card');
+            
+            // Mostrar mensaje correspondiente
+            setTimeout(() => {
+                showOptionMessage();
+            }, 800);
+        }
+        
+        // Función para mostrar mensaje de la opción
+        function showOptionMessage() {
+            // Configurar ícono y título
+            resultIcon.innerHTML = optionIcons[selectedOption];
+            
+            // Cambiar a página de mensaje
+            setTimeout(() => {
+                switchPage('page3');
+                
+                // Configurar mensaje
+                if (selectedOption === '2') {
+                    resultTitle.textContent = "¡Camino Misterioso!";
+                    specialMessage.style.display = 'block';
+                    specialMessageContent.textContent = specialMessages[2];
+                    newDayBtn.style.display = 'inline-block';
+                } else {
+                    resultTitle.textContent = "Camino Seguro";
+                    specialMessage.style.display = 'none';
+                    newDayBtn.style.display = 'none';
+                }
+                
+                // Iniciar efecto de máquina de escribir
+                messageIndex = 0;
+                typingText.textContent = '';
+                cursor.style.display = 'inline-block';
+                
+                // Ocultar botones hasta que termine la animación
+                tryAgainBtn.style.display = 'none';
+                if (selectedOption === '2') {
+                    newDayBtn.style.display = 'none';
+                }
+                
+                // Función para escribir el mensaje
+                function writeMessage() {
+                    if (messageIndex < optionMessages[selectedOption].length) {
+                        typingText.textContent += optionMessages[selectedOption].charAt(messageIndex);
+                        messageIndex++;
+                        setTimeout(writeMessage, typingSpeed);
+                    } else {
+                        cursor.style.display = 'none';
+                        tryAgainBtn.style.display = 'inline-block';
+                        if (selectedOption === '2') {
+                            newDayBtn.style.display = 'inline-block';
+                        }
+                    }
+                }
+                
+                // Iniciar escritura
+                writeMessage();
+            }, 500);
+        }
+        
+        // Efecto especial para el reloj
+        setInterval(() => {
+            const clock = document.getElementById('current-clock');
+            if (clock) {
+                const now = new Date();
+                const hours = now.getHours();
+                const minutes = now.getMinutes();
+                
+                // Si es la hora correcta, efecto especial
+                if (hours === 11 && minutes === 40) {
+                    clock.style.color = '#FFD700';
+                    clock.style.textShadow = '0 0 20px #FFD700';
+                } else {
+                    clock.style.color = '#db7093';
+                    clock.style.textShadow = '0 0 10px rgba(219, 112, 147, 0.7)';
+                }
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
