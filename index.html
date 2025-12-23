@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Beth</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: -1;
+        }
+        
+        .page {
+            display: none;
+            position: relative;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .page.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .container-box {
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            padding: 40px 30px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(219, 112, 147, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(219, 112, 147, 0.3);
+            animation: fadeIn 1s ease;
+        }
+        
+        .live-info {
+            margin-bottom: 20px;
+            color: #ffb6c1;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(219, 112, 147, 0.3);
+        }
+
+        h1, h2 {
+            color: #db7093;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(219, 112, 147, 0.8);
+        }
+        
+        h3 {
+            color: #ffb6c1;
+            margin-bottom: 10px;
+        }
+        
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .card {
+            width: 280px;
+            background: linear-gradient(145deg, rgba(70, 0, 35, 0.8), rgba(100, 0, 50, 0.6));
+            border-radius: 15px;
+            padding: 25px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: #db7093;
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            color: #db7093;
+            margin-bottom: 15px;
+        }
+        
+        .typing-text {
+            white-space: pre-wrap;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #fff;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: justify;
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            text-align-last: left;
+        }
+
+        /* Estilos para párrafos dentro del texto */
+        .typing-text p {
+            text-align: justify;
+            margin-bottom: 15px;
+            text-indent: 20px;
+        }
+
+        /* Estilo para separar párrafos */
+        .paragraph-break {
+            margin-top: 15px;
+            display: block;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: #db7093;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        .status-tag {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #888;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 15px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <video id="bg-video" autoplay loop muted playsinline>
+        <source src="tyy.mp4" type="video/mp4">
+    </video>
+    
+    <div class="overlay"></div>
+
+    <audio id="bg-music" loop>
+        <source src="v.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="page" id="page1">
+        <div class="container-box">
+            <h1><i class="fas fa-gift"></i> Esperando Navidad</h1>
+            <div class="live-info">
+                <div id="full-date-lock" style="font-weight: bold; margin-bottom: 5px;"></div>
+                <div id="current-clock" style="font-size: 2.5rem; font-family: monospace;">--:--:--</div>
+            </div>
+            <p>Este mensaje se desbloqueará automáticamente </p>
+        </div>
+    </div>
+    
+    <div class="page" id="page2">
+        <div class="live-info">
+            <span id="full-date-main"></span> | <span id="clock-main"></span>
+        </div>
+        <div class="container-box" style="max-width: 800px;">
+            <h2><i class="fas fa-heart"></i> Mensajes para Beth: Hola Beth-Zuri, hoy es un día especial. se abrio a la 1 Am porque ya es navidad en denver y ya, Para que lo pudieras leer tranquila</h2>
+            <div class="cards-container">
+                <div class="card" onclick="makeChoice(1)">
+                    <div class="card-icon"><i class="fas fa-star"></i></div>
+                    <h3>Mensaje de Navidad</h3>
+                    <p style="font-size: 0.85rem; color: #ddd;">Haz clic para leer.</p>
+                </div>
+                
+                <div class="card" onclick="makeChoice(2)">
+                    <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <h3>Mensaje Año Nuevo</h3>
+                    <p style="font-size: 0.85rem; color: #ddd;">Próximamente.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="page" id="page3">
+        <div class="container-box">
+            <div class="card-icon" id="result-icon"></div>
+            <h2 id="result-title">Especial</h2>
+            <div class="typing-text" id="typing-text"></div>
+            <button onclick="showPage(1)">Volver</button>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIGURACIÓN DE FECHA OBJETIVO ---
+        const TARGET_YEAR = 2025;
+        const TARGET_MONTH = 11; // Diciembre es 11 en JavaScript
+        const TARGET_DAY = 25;
+        const TARGET_HOUR = 1;   // 01:00 AM
+        const TARGET_MIN = 0;
+
+        const pages = [document.getElementById('page1'), document.getElementById('page2'), document.getElementById('page3')];
+        const audio = document.getElementById('bg-music');
+        
+        const results = {
+            1: `Beth-Zuri Aruni Dhe Ritbert Saucedo,
+
+Quiero decirte palabras que digan exactamente lo que provocas en mí, aunque a veces no sepa decirlo en persona.
+
+Desde que llegaste, algo cambió. Fuiste la primera persona que supo describirme como nadie más lo había hecho, la primera que me hizo sentir entendido sin tener que explicarme de más. Eso dice mucho de ti… y de lo que generas.
+
+Tus ojos son imposibles de ignorar. No solo porque son hermosos, sino porque transmiten calma, seguridad y una dulzura que no se aprende, se nace con ella. Cuando los veo, todo se siente más simple, como si el mundo se acomodara por un momento para que este contigo todo el tiempo que quieras.
+
+Me fascina tu forma de ser, princesa. Tu inteligencia, tu responsabilidad, la manera en la que tomas las cosas en serio sin dejar de ser tú y todos tus talentos tan impresionantes. Eres fuerte, capaz, y al mismo tiempo increíblemente tierna. No solo destacas por lo que haces, sino por lo que inspiras en los demás.
+
+Quiero que sepas algo con total claridad: nada superficial tendría nunca más peso que tú. Si algún día me pidieras dejar cualquier juego, lo haría sin dudar, porque nada de eso se compara con lo que representas. Hay prioridades que no se discuten, y tú ocupas un lugar que se respeta, se cuida y se elige.
+
+Tal vez no siempre soy el mejor demostrando lo que siento, tal vez soy más frío de lo que quisiera, pero contigo lo intento. Porque contigo vale la pena esforzarse, mejorar y crecer porque sé que no me decepcionarías nunca.
+
+Esta Navidad quiero que tengas la certeza de algo, ternura: eres especial de una forma que no se repite, importante de una manera que no se reemplaza, y presente en mi vida como alguien que llegó para quedarse durante mucho mucho tiempo.
+
+Y siempre voy a estar ahí contigo suceda lo que suceda si necesitas a alguien siempre estoy para ti y nunca me molestas ni un solo minuto, no me imagino ni un solo día en el que no hablemos ni siquiera para decirnos un simple “hola” se me rompería el corazón.
+
+A mi ya me ayudaste mucho con todo lo que me dices a diario eres una persona muy importante en mi vida okey sabes y perdóname si no cacho tampoco indirectas en la escuela soy un friki pero así me gusta ser y me hace muy feliz que por primera vez alguien me acepta así porque ni mis padres aceptan que sea un friki, y eso en verdad me duele que no te valoren tus padres solo por tus gustos o que te discriminen pensando que eres raro por tus gustos es algo que tengo que experimentar que todos te traten como alguien raro que te digan que res inteligente pero te hagan menos y menos por ser lo que soy que me guste lo que me gusta no es fácil crecer en una familia donde todos tienen sus proyectos tienen sus habilidades actividades y sean genios en cada cosa que hagan y que yo sea el único que tena estos gustos y siempre te hagan menos, pero tu me haz demostrado que si puede haber personas tan talentosas y maravillosas que no te hagan menos y te valoren como tú.
+
+Con todo lo que soy y, ahora tu eres parte de mi corazón
+
+Jesús Emanuel Rodriguez Sánchez`,
+            2: `¡Feliz Año Nuevo Beth! Espero que este próximo año esté lleno de alegría y que sigamos compartiendo momentos así de especiales. ¡Te quiero!`
+        };
+
+        function updateLiveClock() {
+            const now = new Date();
+            const targetDate = new Date(TARGET_YEAR, TARGET_MONTH, TARGET_DAY, TARGET_HOUR, TARGET_MIN, 0);
+            
+            // Formato de fecha: "jueves, 25 de diciembre de 2025"
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('es-ES', options);
+            const timeStr = now.toLocaleTimeString('es-ES', {hour12: false});
+
+            // Actualizar textos en pantalla
+            document.getElementById('current-clock').textContent = timeStr;
+            document.getElementById('full-date-lock').textContent = dateStr;
+            document.getElementById('clock-main').textContent = timeStr;
+            document.getElementById('full-date-main').textContent = dateStr;
+
+            // Lógica de apertura automática
+            if (now >= targetDate) {
+                if (pages[0].classList.contains('active')) {
+                    showPage(1); // Desbloquear automáticamente
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(updateLiveClock, 1000);
+            updateLiveClock();
+
+            const ahora = new Date();
+            const apertura = new Date(TARGET_YEAR, TARGET_MONTH, TARGET_DAY, TARGET_HOUR, TARGET_MIN, 0);
+            
+            if (ahora >= apertura) {
+                showPage(1); // Abre el menú si ya pasó la hora
+            } else {
+                showPage(0); // Muestra reloj de espera
+            }
+        });
+
+        function showPage(index) {
+            pages.forEach(p => p.classList.remove('active'));
+            pages[index].classList.add('active');
+        }
+
+        function makeChoice(option) {
+            if(audio.paused) { audio.volume = 0.5; audio.play(); }
+            showResultPage(option);
+        }
+
+        function showResultPage(option) {
+            showPage(2);
+            const iconDiv = document.getElementById('result-icon');
+            const textDiv = document.getElementById('typing-text');
+            iconDiv.innerHTML = option === 1 ? '<i class="fas fa-star"></i>' : '<i class="fas fa-calendar-alt"></i>';
+
+            let text = results[option];
+            let i = 0;
+            textDiv.textContent = "";
+            
+            function typeWriter() {
+                if (i < text.length) {
+                    textDiv.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 15); 
+                }
+            }
+            typeWriter();
+        }
+    </script>
+</body>
+</html>
