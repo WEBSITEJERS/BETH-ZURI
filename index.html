@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Beth</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        #bg-video {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: -1;
+        }
+        
+        .page {
+            display: none;
+            position: relative;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .page.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+        
+        .container-box {
+            max-width: 700px;
+            width: 90%;
+            text-align: center;
+            padding: 40px 30px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            box-shadow: 0 0 40px rgba(219, 112, 147, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(219, 112, 147, 0.3);
+            animation: fadeIn 1s ease;
+        }
+        
+        .live-info {
+            margin-bottom: 20px;
+            color: #ffb6c1;
+            text-align: center;
+            background: rgba(0,0,0,0.5);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(219, 112, 147, 0.3);
+        }
+
+        h1, h2 {
+            color: #db7093;
+            margin-bottom: 25px;
+            text-shadow: 0 0 15px rgba(219, 112, 147, 0.8);
+        }
+        
+        h3 {
+            color: #ffb6c1;
+            margin-bottom: 10px;
+        }
+        
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .card {
+            width: 280px;
+            background: linear-gradient(145deg, rgba(70, 0, 35, 0.8), rgba(100, 0, 50, 0.6));
+            border-radius: 15px;
+            padding: 25px 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .card:hover {
+            transform: translateY(-10px);
+            border-color: #db7093;
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            color: #db7093;
+            margin-bottom: 15px;
+        }
+        
+        .typing-text {
+            white-space: pre-wrap; /* Mantiene los saltos de línea de la carta */
+            font-size: 1.05rem;
+            line-height: 1.6;
+            color: #fff;
+            max-height: 400px;
+            overflow-y: auto;
+            text-align: left; /* Cambiado a left para que las cartas se lean mejor */
+            background: rgba(0,0,0,0.3);
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 12px 30px;
+            background: #db7093;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <video id="bg-video" autoplay loop muted playsinline>
+        <source src="tyy.mp4" type="video/mp4">
+    </video>
+    
+    <div class="overlay"></div>
+
+    <audio id="bg-music" loop>
+        <source src="v.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="page" id="page1">
+        <div class="container-box">
+            <h1><i class="fas fa-gift"></i> Esperando Navidad</h1>
+            <div class="live-info">
+                <div id="full-date-lock" style="font-weight: bold; margin-bottom: 5px;"></div>
+                <div id="current-clock" style="font-size: 2.5rem; font-family: monospace;">--:--:--</div>
+            </div>
+            <p>Este mensaje se desbloqueará automáticamente </p>
+        </div>
+    </div>
+    
+    <div class="page" id="page2">
+        <div class="live-info">
+            <span id="full-date-main"></span> | <span id="clock-main"></span>
+        </div>
+        <div class="container-box" style="max-width: 800px;">
+            <h2><i class="fas fa-heart"></i> Mensajes para Beth</h2>
+            <p style="margin-bottom: 20px;">Hola, ahora se abrio a las 11 pm por que ya es año nuevo en Washington DC.</p>
+            <div class="cards-container">
+                <div class="card" onclick="makeChoice(1)">
+                    <div class="card-icon"><i class="fas fa-star"></i></div>
+                    <h3>Mensaje de Navidad</h3>
+                    <p style="font-size: 0.85rem; color: #ddd;">Haz clic para leer.</p>
+                </div>
+                
+                <div class="card" onclick="makeChoice(2)">
+                    <div class="card-icon"><i class="fas fa-calendar-alt"></i></div>
+                    <h3>Mensaje Año Nuevo</h3>
+                    <p style="font-size: 0.85rem; color: #ddd;">Haz clic para leer.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="page" id="page3">
+        <div class="container-box">
+            <div class="card-icon" id="result-icon"></div>
+            <h2 id="result-title">Especial</h2>
+            <div class="typing-text" id="typing-text"></div>
+            <button onclick="showPage(1)">Volver</button>
+        </div>
+    </div>
+
+    <script>
+        const TARGET_YEAR = 2025;
+        const TARGET_MONTH = 11; 
+        const TARGET_DAY = 31;
+        const TARGET_HOUR = 23;   
+        const TARGET_MIN = 0;
+
+        const pages = [document.getElementById('page1'), document.getElementById('page2'), document.getElementById('page3')];
+        const audio = document.getElementById('bg-music');
+        
+        const results = {
+            1: `Beth-Zuri Aruni Dhe Ritbert Saucedo,
+
+si llevas a ver esto es porque ya no se que hacer cada día es peor pense que con el tiempo mejoraria pero no puedo empeora no aguanto,
+
+nececito que estes conmigo, no perdono mi error me critico, no soy suficiente, me siento mal no aguanto la vdd y si lo hago por aqui es porque,
+
+no me gusta que piensen otra cosas yo se que ni tienes esta pagina pero bueno talvez algun dia se me ocurra algo para que la obtengas de nuevo,
+
+escribo esto el 11/02/26 la caida más grande hasta el momento, mis ataques de ansiedad no me dejan cada vez son más comunes no puedo seguir así 
+
+pense ya varias veces soluciones pero no las encuentro talvez hablar con tus padres pero yo no tengo sus numero bueno ya no, esperar y seguir igual
+
+pero lo que me duele más que nose si aun vas a estar ahi para mi pero te veo y se que puedes ser feliz con las personas que tienes a tu alrededor 
+
+y eso me conforta un poco, minimo hay algo bueno para ti espero que sigas muy bien y si no te hablo es porque yo se que es lo que me obligaron a hacer,
+
+y odio eso porque no soy alguien irrespetuoso y no les hubiera hecho caso y reclamarles, pero me aterra esa forma dee ser no me gusta no me veo siendo
+
+inmaduro o irrespetuoso, lo intente les dije que no era nadie malo aun no me conocian pero yo pues no soy lo que seguramente pensaban, desde hace 4 años que no tenia que ir 
+
+al psicologo por un ataque de ansiedad y me acuerdo hace 4 años que me dijo super claro que padecia de depresion y ansiedad social, volvi a escuhar esas palabras
+
+y no sabes cuanto me aterran recuerdo que en las noches cuando no podia dormir y me sentia tan solo la idea de morir no me parecia tan mala, obvio regresaba en mi
+
+y me daba cuenta de que estaba diciendo yo no podia más, gracias al cielo lo pude manejar ya solo era 1 año y me sumergi en los estudios eso me salvo pero aun no empieza lo duro en la escuela 
+
+nada es correcto solo lo que hago hay otra de cambio de grupo pero nose si me ayude o me afecte creo que esto te hace más daño a ti porque no te dejo no te suelto 
+
+pero odio esto perdoname toda la vida, me han preguntado mis padres que que me pasa pero no les puedo contar, no puedo hablar con nadie solo conmigo y con una pagina donde nunca sabre si se leeran 
+
+los mensajes que escribo se borro el útimo pero bueno no puedo darle repasos a todos como sieempre perdon por faltas ortograficas y falta de acentos esto lo hago en la noche no veo bien el teclado y estoy cansado hora de ejecucion
+
+19:11:23(solo estara 30s min hoy la estrategia que tendre sera un estatus en codigo ascii) si a esta hora estas despierta lo veras no tengo proroga y la vdd ya no se que hacer me duele más saber que te afecte en tu relacion de familia aaah no se ni que soy 
+
+en lo más bajo de todo ojala y cifrar todo esto y ponerlo en un punto zip y que desintalar mis rar de sentimientos. Si alguna ves lo leés porfavor solo tú estoy cansado de que 
+
+mal interpreten lo que hago muy cansado. que enojo tambien si esto te afecta aaaa no ya última del mes porfavor. ( es una promesa para mi )
+
+
+Jesús Emanuel Rodriguez Sánchez`,
+
+            2: `Beth-Zuri,
+
+perdon deje todo en la otra no compartas nada si lo encuentras 
+|JERS|`
+        };
+
+        function updateLiveClock() {
+            const now = new Date();
+            const targetDate = new Date(TARGET_YEAR, TARGET_MONTH, TARGET_DAY, TARGET_HOUR, TARGET_MIN, 0);
+            
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            const dateStr = now.toLocaleDateString('es-ES', options);
+            const timeStr = now.toLocaleTimeString('es-ES', {hour12: false});
+
+            document.getElementById('current-clock').textContent = timeStr;
+            document.getElementById('full-date-lock').textContent = dateStr;
+            document.getElementById('clock-main').textContent = timeStr;
+            document.getElementById('full-date-main').textContent = dateStr;
+
+            if (now >= targetDate) {
+                if (pages[0].classList.contains('active')) {
+                    showPage(1); 
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setInterval(updateLiveClock, 1000);
+            updateLiveClock();
+
+            const ahora = new Date();
+            const apertura = new Date(TARGET_YEAR, TARGET_MONTH, TARGET_DAY, TARGET_HOUR, TARGET_MIN, 0);
+            
+            if (ahora >= apertura) {
+                showPage(1);
+            } else {
+                showPage(0);
+            }
+        });
+
+        function showPage(index) {
+            pages.forEach(p => p.classList.remove('active'));
+            pages[index].classList.add('active');
+        }
+
+        function makeChoice(option) {
+            if(audio.paused) { audio.volume = 0.5; audio.play(); }
+            showResultPage(option);
+        }
+
+        function showResultPage(option) {
+            showPage(2);
+            const iconDiv = document.getElementById('result-icon');
+            const textDiv = document.getElementById('typing-text');
+            const titleDiv = document.getElementById('result-title');
+            
+            iconDiv.innerHTML = option === 1 ? '<i class="fas fa-star"></i>' : '<i class="fas fa-calendar-alt"></i>';
+            titleDiv.textContent = option === 1 ? "Mensaje de Navidad" : "Mensaje de Año Nuevo";
+
+            let text = results[option];
+            let i = 0;
+            textDiv.textContent = "";
+            
+            function typeWriter() {
+                if (i < text.length) {
+                    textDiv.textContent += text.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, 15); 
+                    // Auto-scroll hacia abajo mientras escribe
+                    textDiv.scrollTop = textDiv.scrollHeight;
+                }
+            }
+            typeWriter();
+        }
+    </script>
+</body>
+</html>
